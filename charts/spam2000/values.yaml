@@ -3,6 +3,9 @@ revisionHistoryLimit: 3
 
 fullname: spam2000
 
+createNamespace: true
+namespace: spam2000
+
 image:
   repository: andriiuni/spam2000
   pullPolicy: IfNotPresent
