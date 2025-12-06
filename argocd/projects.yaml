@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: spam2000
+  namespace: argocd
+spec:
+  description: Project for spam2000
+  destinations:
+  - namespace: spam2000
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - https://github.com/nvd-ros/testing-task.git
+  clusterResourceWhitelist:
+  - group: ""
+    kind: Namespace

@@ -21,6 +21,11 @@ SYSTEMWIDE="false"
 BIN_DIR="./bin"
 SYSTEMWIDE_BIN_DIR="/usr/local/bin"
 
+ARGOCD_RELEASE="argocd"
+ARGOCD_VERSION="9.1.6"
+ARGOCD_VALUES="./values/argocd.yaml"
+ARGOCD_NS="argocd"
+
 # ---------------------------------------------------------------------------
 # HELPERS FUNCTIONS
 # ---------------------------------------------------------------------------
@@ -127,7 +132,7 @@ echoinfo "$SYSTEMWIDE"
 echoinfo ""
 
 echoinfo "Checking path for binaries"
-if [ "$SYSTEMWIDE" = "false" ]; then
+if [[ "$SYSTEMWIDE" = "false" ]]; then
     echoinfo "Creating $BIN_DIR directory for all needed binaries"
     mkdir -pv "$BIN_DIR"
     export PATH="$PATH:$PWD/$BIN_DIR"
@@ -165,7 +170,7 @@ fi
 
 echoinfo "Checking helm"
 if ! command -v helm &> /dev/null; then
-    echo "Helm not found. Installing locally..."
+    echoinfo "Helm not found. Installing locally..."
     HELM_VERSION=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | grep tag_name | cut -d '"' -f 4)
     curl -L https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz -o helm.tar.gz
     tar -zxvf helm.tar.gz
@@ -173,20 +178,55 @@ if ! command -v helm &> /dev/null; then
     chmod +x "$BIN_DIR/helm"
     rm -rfv linux-amd64 helm.tar.gz
 else
-    echo "Helm is already installed."
+    echoinfo "Helm is already installed."
 fi
-
 
 echoinfo "Checking if minikube cluster exists"
 if minikube status &> /dev/null; then
-    echo "Minikube cluster is already running."
+    echoinfo "Minikube cluster is already running."
 else
-    echo "Minikube is not running. Starting..."
+    echoinfo "Minikube is not running. Starting..."
     minikube start --driver=docker --memory=$MINIKUBE_MEMORY --cpus=$MINIKUBE_CPU
 fi
 
-# -------------------- Installing applications --------------------
+# -------------------- Installing ArgoCD --------------------
 
+echoinfo "Checking argocd namespace"
+if ! kubectl get ns argocd &>/dev/null; then
+    echoinfo "Creating namespace argocd..."
+    kubectl create ns argocd
+else
+    echoinfo "argocd namespace exists"
+fi
+
+echoinfo "Checking argo helm repo"
+if ! helm repo list | grep -q "argo"; then
+    echoinfo "Adding Argo Helm repo..."
+    helm repo add argo "https://argoproj.github.io/argo-helm"
+else
+    echoinfo "argo helm repo exists"
+fi
+
+echoinfo "Updating helm repos"
+helm repo update
+
+if ! helm list -n "$ARGOCD_NS" | grep -q "$ARGOCD_RELEASE"; then
+    echoinfo "Installing ArgoCD..."
+    helm install "$ARGOCD_RELEASE" argo/argo-cd \
+        -n "$ARGOCD_NS" --create-namespace \
+        --version "$ARGOCD_VERSION" \
+        -f "$ARGOCD_VALUES"
+else
+    echoinfo "Release $ARGOCD_RELEASE exists. Upgrading..."
+    helm upgrade "$ARGOCD_RELEASE" argo/argo-cd \
+        -n "$ARGOCD_NS" \
+        -f "$ARGOCD_VALUES"
+fi
+
+echoinfo "For ArgoCD"
+echoinfo "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d"
+echoinfo "kubectl port-forward service/argocd-server -n argocd 8080:443"
+echoinfo "minikube service argocd-server -n argocd"
 
 
 echoinfo "DONE"

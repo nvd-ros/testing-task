@@ -1,0 +1,52 @@
+replicaCount: 1
+revisionHistoryLimit: 3
+
+fullname: spam2000
+
+image:
+  repository: andriiuni/spam2000
+  pullPolicy: IfNotPresent
+  tag: "1.1394.355"
+
+labels:
+  app: spam2000
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 300Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+livenessProbe:
+  httpGet:
+    path: "/health"
+    port: http
+  periodSeconds: 5
+readinessProbe:
+  httpGet:
+    path: "/health"
+    port: http
+  periodSeconds: 3
+  failureThreshold: 1
+startupProbe:
+  httpGet:
+    path: "/health"
+    port: http
+  failureThreshold: 3
+  periodSeconds: 5
+
