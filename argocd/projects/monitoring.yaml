@@ -1,0 +1,15 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: monitoring
+  namespace: argocd
+spec:
+  description: Project for monitoring (Grafana, VictoriaMetrics)
+  destinations:
+  - namespace: monitoring
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - https://github.com/nvd-ros/testing-task.git
+  clusterResourceWhitelist:
+  - group: ""
+    kind: Namespace

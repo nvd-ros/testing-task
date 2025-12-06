@@ -14,7 +14,7 @@ CMDNAME=$(basename $0)
 SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 MINIKUBE_CPU="2"
-MINIKUBE_MEMORY="2096"
+MINIKUBE_MEMORY="4096"
 MINIKUBE_DRIVER="docker"
 SYSTEMWIDE="false"
 
@@ -23,7 +23,6 @@ SYSTEMWIDE_BIN_DIR="/usr/local/bin"
 
 ARGOCD_RELEASE="argocd"
 ARGOCD_VERSION="9.1.6"
-ARGOCD_VALUES="./values/argocd.yaml"
 ARGOCD_NS="argocd"
 
 # ---------------------------------------------------------------------------
@@ -153,7 +152,7 @@ fi
 echoinfo "Checking kubectl"
 if ! command -v kubectl &> /dev/null; then
     echoinfo "kubectl not found. Downloading..."
-    curl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/$(uname | tr '[:upper:]' '[:lower:]')/amd64/kubectl" -o /bin/kubectl
+    curl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/$(uname | tr '[:upper:]' '[:lower:]')/amd64/kubectl" -o "$BIN_DIR/kubectl"
     chmod +x "$BIN_DIR/kubectl"
     kubectl version --client
 else
@@ -162,10 +161,9 @@ fi
 
 echoinfo "Checking $MINIKUBE_DRIVER driver"
 if ! command -v "$MINIKUBE_DRIVER" &> /dev/null; then
-    echoerr "Docker is not installed. Please install Docker before running this script and check if docker is running(Windows/WSL)"
-    exit 1
+    echoerr "$MINIKUBE_DRIVER is not installed. Please install $MINIKUBE_DRIVER before running this script. For Docker be sure it is running"
 else
-    echoinfo "Docker is installed"
+    echoinfo "$MINIKUBE_DRIVER is installed"
 fi
 
 echoinfo "Checking helm"
@@ -182,11 +180,13 @@ else
 fi
 
 echoinfo "Checking if minikube cluster exists"
-if minikube status &> /dev/null; then
+if $MINIKUBE_DRIVER inspect minikube &> /dev/null; then
     echoinfo "Minikube cluster is already running."
 else
     echoinfo "Minikube is not running. Starting..."
-    minikube start --driver=docker --memory=$MINIKUBE_MEMORY --cpus=$MINIKUBE_CPU
+    minikube start --driver=$MINIKUBE_DRIVER --memory=$MINIKUBE_MEMORY --cpus=$MINIKUBE_CPU
+    echoinfo "Enabling Ingress..."
+    minikube addons enable ingress
 fi
 
 # -------------------- Installing ArgoCD --------------------
@@ -215,17 +215,22 @@ if ! helm list -n "$ARGOCD_NS" | grep -q "$ARGOCD_RELEASE"; then
     helm install "$ARGOCD_RELEASE" argo/argo-cd \
         -n "$ARGOCD_NS" --create-namespace \
         --version "$ARGOCD_VERSION" \
-        -f "$ARGOCD_VALUES"
+        --set server.extraArgs[0]="--insecure"
 else
     echoinfo "Release $ARGOCD_RELEASE exists. Upgrading..."
     helm upgrade "$ARGOCD_RELEASE" argo/argo-cd \
         -n "$ARGOCD_NS" \
-        -f "$ARGOCD_VALUES"
+        --set server.extraArgs[0]="--insecure"
+
 fi
 
+echoinfo "Applying argocd resources"
+kubectl apply -f argocd/ --recursive
+
+ARGOCD_PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+
 echoinfo "For ArgoCD"
-echoinfo "kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d"
-echoinfo "kubectl port-forward service/argocd-server -n argocd 8080:443"
+echoinfo "To get access to the ArgoCD UI, use 'admin' user and '' initial password. Change it"
 echoinfo "minikube service argocd-server -n argocd"
 
 
