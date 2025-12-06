@@ -29,11 +29,11 @@ service:
 
 resources:
   limits:
-    cpu: 200m
-    memory: 300Mi
+    cpu: 400m
+    memory: 512Mi
   requests:
     cpu: 100m
-    memory: 128Mi
+    memory: 256Mi
 
 livenessProbe:
   httpGet:
