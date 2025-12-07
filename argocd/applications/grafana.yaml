@@ -11,15 +11,17 @@ spec:
   - repoURL: https://grafana.github.io/helm-charts
     chart: grafana-operator
     targetRevision: v5.20.0
-  - repoURL: https://github.com/nvd-ros/testing-task.git
-    targetRevision: main
-    path: monitoring/grafana
   - repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-state-metrics
     targetRevision: 6.4.2
   - repoURL: https://prometheus-community.github.io/helm-charts
     chart: prometheus-node-exporter
     targetRevision: 4.49.2
+  - repoURL: https://github.com/nvd-ros/testing-task.git
+    targetRevision: main
+    path: monitoring/grafana
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
