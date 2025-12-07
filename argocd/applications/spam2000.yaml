@@ -4,7 +4,7 @@ metadata:
   name: spam2000
   namespace: argocd
 spec:
-  project: default
+  project: spam2000
   source:
     repoURL: https://github.com/nvd-ros/testing-task.git
     targetRevision: main
@@ -16,3 +16,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

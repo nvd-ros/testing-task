@@ -139,7 +139,6 @@ else
     BIN_DIR="$SYSTEMWIDE_BIN_DIR"
 fi
 
-
 if ! command -v minikube &> /dev/null; then
     echoinfo "Minikube not found. Downloading..."
     curl -L https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64 -o "$BIN_DIR/minikube"
@@ -242,7 +241,7 @@ fi
 echoinfo "Credentials are: admin:$ARGOCD_PASS\n"
 
 echoinfo "Waiting for monitoring to be ready"
-kubectl wait -n argocd application monitoring --for='jsonpath={.status.sync.status}=Synced' --timeout="$TIMEOUT"
+kubectl wait -n argocd application victoriametrics --for='jsonpath={.status.sync.status}=Synced' --timeout="$TIMEOUT"
 
 GRAFANA_PASS=$(kubectl get secret -n "$MONITORING_NS" grafana-admin-credentials -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 -d)
 

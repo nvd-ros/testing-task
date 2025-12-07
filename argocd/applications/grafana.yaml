@@ -4,10 +4,10 @@ metadata:
   name: grafana
   namespace: argocd
 spec:
-  project: grafana
+  project: monitoring
   sources:
   - repoURL: https://grafana.github.io/helm-charts
-    chart: grafana/grafana-operator
+    chart: grafana-operator
     targetRevision: v5.20.0
   - repoURL: https://github.com/nvd-ros/testing-task.git
     targetRevision: main

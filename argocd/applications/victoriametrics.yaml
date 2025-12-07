@@ -4,10 +4,10 @@ metadata:
   name: victoriametrics
   namespace: argocd
 spec:
-  project: victoriametrics
+  project: monitoring
   sources:
   - repoURL: https://victoriametrics.github.io/helm-charts/
-    chart: vm/victoria-metrics-operator
+    chart: victoria-metrics-operator
     targetRevision: 0.57.1
   - repoURL: https://github.com/nvd-ros/testing-task.git
     targetRevision: main
