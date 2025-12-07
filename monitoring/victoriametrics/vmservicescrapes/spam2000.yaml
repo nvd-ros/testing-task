@@ -9,6 +9,7 @@ spec:
     matchNames: [ "spam2000" ]
   endpoints:
   - port: http
+    maxScrapeSize: 67108864 #64bm
   selector:
     matchLabels:
       app: spam2000

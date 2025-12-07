@@ -251,12 +251,14 @@ if ! helm list -n "$ARGOCD_NS" | grep -q "$ARGOCD_RELEASE"; then
     helm install "$ARGOCD_RELEASE" argo/argo-cd \
         -n "$ARGOCD_NS" --create-namespace \
         --version "$ARGOCD_VERSION" \
-        --set server.extraArgs[0]="--insecure"
+        --set server.extraArgs[0]="--insecure"\
+        --set server.metrics.enabled="true"
 else
     echoinfo "Release $ARGOCD_RELEASE exists. Upgrading..."
     helm upgrade "$ARGOCD_RELEASE" argo/argo-cd \
         -n "$ARGOCD_NS" \
-        --set server.extraArgs[0]="--insecure"
+        --set server.extraArgs[0]="--insecure" \
+        --set server.metrics.enabled="true"
 fi
 
 echoinfo "Waiting for argocd to be ready"

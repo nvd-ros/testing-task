@@ -99,13 +99,13 @@ spec:
                 "uid": "victoriametricsdatasource"
               },
               "editorMode": "code",
-              "expr": "count(count by (product) ($gauge))",
+              "expr": "count(count by (email) ($gauge))",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
             }
           ],
-          "title": "Unique Products",
+          "title": "Unique Users",
           "type": "gauge"
         },
         {

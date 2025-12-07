@@ -1,0 +1,14 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: node-exporter-full
+  namespace: monitoring
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  folder: cluster
+  url: https://grafana.com/api/dashboards/1860/revisions/latest/download
+  datasources:
+  - inputName: victoriametrics
+    datasourceName: victoriametrics
