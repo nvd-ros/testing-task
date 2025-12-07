@@ -26,7 +26,7 @@ ARGOCD_VERSION="9.1.6"
 ARGOCD_NS="argocd"
 ARGOCD_LOCAL_PORT="6080"
 
-TIMEOUT="180s"
+TIMEOUT="300s"
 MONITORING_NS="monitoring"
 GRAFANA_LOCAL_PORT="3000"
 VM_LOCAL_PORT="8229"
@@ -84,16 +84,36 @@ check_option_argument() {
 # FUNCTIONS
 # ---------------------------------------------------------------------------
 
+wait_for_service() {
+    local svc_name="$1"
+    local ns="$2"
+
+    timeout 60 bash -c "
+    echo 'Waiting for service $svc_name in $ns'
+    until kubectl get svc $svc_name -n $ns >/dev/null 2>&1; do
+        echo '.'
+        sleep 2
+    done"
+    if [ $? -ne 0 ]; then
+        echoinfo "Timed out waiting for service :("
+    else
+        echoinfo "Service $svc_name exists"
+    fi
+}
+
+
 create_port_forward() {
     local svc_name="$1"
     local localport="$2"
-    local svcport="$2"
+    local svcport="$3"
+    local ns="$4"
 
+    wait_for_service "$svc_name" "$ns"
     if ps aux | grep -v grep | grep "kubectl .*port-forward .*svc/$svc_name .*${localport}:$svcport" &>/dev/null; then
         echoinfo "Port-forwarding exists, use localhost:${VMAGENT_LOCAL_PORT}"
     else
         echoinfo "Starting port-forward..."
-        nohup kubectl port-forward -n $MONITORING_NS svc/$svc_name ${localport}:$svcport &> /dev/null &
+        nohup kubectl port-forward -n ${ns} svc/$svc_name ${localport}:$svcport &> /dev/null &
         echoinfo "Port forwarding was created, use localhost:${localport}"
     fi
 
@@ -251,23 +271,26 @@ kubectl apply -f argocd/ --recursive
 ARGOCD_PASS=$(kubectl get secret -n "$ARGOCD_NS" argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 
 echoinfo "\nFor ArgoCD"
-create_port_forward "argocd-server" "${ARGOCD_LOCAL_PORT}" "80"
+create_port_forward "argocd-server" "${ARGOCD_LOCAL_PORT}" "80" "$ARGOCD_NS"
 echoinfo "Credentials are: admin:$ARGOCD_PASS\n"
 
 echoinfo "Waiting for Grafana to be ready"
-kubectl wait -n argocd application grafana --for='jsonpath={.status.sync.status}=Synced' --timeout="$TIMEOUT"
+kubectl wait -n argocd application grafana --for='jsonpath={.status.health.status}=Healthy' --timeout="$TIMEOUT"
 
 GRAFANA_PASS=$(kubectl get secret -n "$MONITORING_NS" grafana-admin-credentials -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 -d)
 
 echoinfo "\nFor Grafana"
-create_port_forward "grafana-service" "${GRAFANA_LOCAL_PORT}" "3000"
+create_port_forward "grafana-service" "${GRAFANA_LOCAL_PORT}" "3000" "$MONITORING_NS"
 echoinfo "Credentials are: admin:$GRAFANA_PASS\n"
 
+echoinfo "Waiting for VictoriaMetrics to be ready"
+kubectl wait -n argocd application victoriametrics --for='jsonpath={.status.health.status}=Healthy' --timeout="$TIMEOUT"
+
 echoinfo "\nFor VictoriaMetrics"
-create_port_forward "vmsingle-vm-single" "${VM_LOCAL_PORT}" "8429"
+create_port_forward "vmsingle-vm-single" "${VM_LOCAL_PORT}" "8429" "$MONITORING_NS"
 
 echoinfo "\nFor VMAgent"
-create_port_forward "vmagent-vm-agent" "${VMAGENT_LOCAL_PORT}" "8429"
+create_port_forward "vmagent-vm-agent" "${VMAGENT_LOCAL_PORT}" "8429" "$MONITORING_NS"
 
 echoinfo "DONE"
 exit 0
