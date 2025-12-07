@@ -232,12 +232,13 @@ if ps aux | grep -v grep | grep 'kubectl .*port-forward .*svc/argocd-server .*30
     echoinfo "Port-forwarding exists, use locahost:3000"
 else
     echoinfo "Starting port-forward..."
-    nohup kubectl port-forward -n "$ARGOCD_NS" svc/argocd-server 3000:80 &> /dev/null &
+    nohup kubectl port-forward -n "$ARGOCD_NS" svc/argocd-server 8000:80 &> /dev/null &
     echoinfo "Port forwarding was created, use locahost:3000"
 fi
 echoinfo "Credentials are: admin:$ARGOCD_PASS\n"
 
 echoinfo "Waiting for monitoring is ready"
+kubectl apply -f monitoring
 kubectl wait -n argocd application monitoring --for='jsonpath={.status.sync.status}=Synced' --timeout="$TIMEOUT"
 
 GRAFANA_PASS=$(kubectl get secret -n "$MONITORING_NS" monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 -d)
@@ -247,10 +248,14 @@ if ps aux | grep -v grep | grep 'kubectl .*port-forward .*svc/monitoring-grafana
     echoinfo "Port-forwarding exists, use locahost:4000"
 else
     echoinfo "Starting port-forward..."
-    nohup kubectl port-forward -n monitoring svc/monitoring-grafana 4000:80 &> /dev/null &
+    nohup kubectl port-forward -n monitoring svc/monitoring-grafana 7000:80 &> /dev/null &
     echoinfo "Port forwarding was created, use locahost:4000"
 fi
 echoinfo "Credentials are: admin:$GRAFANA_PASS\n"
+
+echoinfo "Starting port-forward for vmagent..."
+nohup kubectl port-forward -n monitoring svc/vmagent-monitoring-vmks 8429:8429 &> /dev/null &
+echoinfo "Port forwarding was created, use locahost:8429"
 
 echoinfo "DONE"
 exit 0

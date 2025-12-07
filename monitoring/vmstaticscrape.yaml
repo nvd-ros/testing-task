@@ -1,0 +1,13 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMStaticScrape
+metadata:
+  name: spam2000-scrape
+  namespace: monitoring
+spec:
+  jobName: spam2000
+  targetEndpoints:
+  - targets: ["spam2000.spam2000.svc.cluster.local:3000"]
+    scheme: "http"
+    path: "/metrics"
+    labels:
+      service: spam2000

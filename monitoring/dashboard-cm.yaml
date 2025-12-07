@@ -1,0 +1,390 @@
+apiVersion: v1
+data:
+  dashboard-spam2000.json: |-
+    {
+      "apiVersion": "dashboard.grafana.app/v2beta1",
+      "kind": "Dashboard",
+      "metadata": {
+        "name": "ad59zrx",
+        "namespace": "default",
+        "uid": "m0zie7S8FF16WKX2XMdbXLmPNrXgXXrYKFFJX7Iy5EEX",
+        "resourceVersion": "15",
+        "generation": 17,
+        "creationTimestamp": "2025-12-07T14:20:06Z",
+        "labels": {
+          "grafana.app/deprecatedInternalID": "18"
+        },
+        "annotations": {
+          "grafana.app/createdBy": "user:ff6dowg6t6dq8e",
+          "grafana.app/updatedBy": "user:ff6dowg6t6dq8e",
+          "grafana.app/updatedTimestamp": "2025-12-07T16:01:56Z",
+          "grafana.app/saved-from-ui": "Grafana v12.3.0 (20051fb1fc)"
+        }
+      },
+      "spec": {
+        "annotations": [
+          {
+            "kind": "AnnotationQuery",
+            "spec": {
+              "builtIn": true,
+              "enable": true,
+              "hide": true,
+              "iconColor": "rgba(0, 211, 255, 1)",
+              "name": "Annotations & Alerts",
+              "query": {
+                "datasource": {
+                  "name": "-- Grafana --"
+                },
+                "group": "grafana",
+                "kind": "DataQuery",
+                "spec": {},
+                "version": "v0"
+              }
+            }
+          }
+        ],
+        "cursorSync": "Off",
+        "editable": true,
+        "elements": {
+          "panel-1": {
+            "kind": "Panel",
+            "spec": {
+              "data": {
+                "kind": "QueryGroup",
+                "spec": {
+                  "queries": [
+                    {
+                      "kind": "PanelQuery",
+                      "spec": {
+                        "hidden": false,
+                        "query": {
+                          "datasource": {
+                            "name": "P4169E866C3094E38"
+                          },
+                          "group": "prometheus",
+                          "kind": "DataQuery",
+                          "spec": {
+                            "editorMode": "code",
+                            "expr": "count(count by (product) ($random_gauge))",
+                            "legendFormat": "__auto",
+                            "range": true
+                          },
+                          "version": "v0"
+                        },
+                        "refId": "A"
+                      }
+                    }
+                  ],
+                  "queryOptions": {},
+                  "transformations": []
+                }
+              },
+              "description": "",
+              "id": 1,
+              "links": [],
+              "title": "Unique Products",
+              "vizConfig": {
+                "group": "gauge",
+                "kind": "VizConfig",
+                "spec": {
+                  "fieldConfig": {
+                    "defaults": {
+                      "color": {
+                        "mode": "thresholds"
+                      },
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "color": "green",
+                            "value": 0
+                          }
+                        ]
+                      }
+                    },
+                    "overrides": []
+                  },
+                  "options": {
+                    "minVizHeight": 75,
+                    "minVizWidth": 75,
+                    "orientation": "auto",
+                    "reduceOptions": {
+                      "calcs": [
+                        "lastNotNull"
+                      ],
+                      "fields": "",
+                      "values": false
+                    },
+                    "showThresholdLabels": false,
+                    "showThresholdMarkers": true,
+                    "sizing": "auto"
+                  }
+                },
+                "version": "12.3.0"
+              }
+            }
+          },
+          "panel-2": {
+            "kind": "Panel",
+            "spec": {
+              "data": {
+                "kind": "QueryGroup",
+                "spec": {
+                  "queries": [
+                    {
+                      "kind": "PanelQuery",
+                      "spec": {
+                        "hidden": false,
+                        "query": {
+                          "datasource": {
+                            "name": "P4169E866C3094E38"
+                          },
+                          "group": "prometheus",
+                          "kind": "DataQuery",
+                          "spec": {
+                            "editorMode": "code",
+                            "expr": "count by (country) ($random_gauge)",
+                            "legendFormat": "__auto",
+                            "range": true
+                          },
+                          "version": "v0"
+                        },
+                        "refId": "A"
+                      }
+                    }
+                  ],
+                  "queryOptions": {},
+                  "transformations": []
+                }
+              },
+              "description": "",
+              "id": 2,
+              "links": [],
+              "title": "By Country",
+              "vizConfig": {
+                "group": "bargauge",
+                "kind": "VizConfig",
+                "spec": {
+                  "fieldConfig": {
+                    "defaults": {
+                      "color": {
+                        "mode": "thresholds"
+                      },
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "color": "green",
+                            "value": 0
+                          }
+                        ]
+                      }
+                    },
+                    "overrides": []
+                  },
+                  "options": {
+                    "displayMode": "gradient",
+                    "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": false
+                    },
+                    "maxVizHeight": 300,
+                    "minVizHeight": 16,
+                    "minVizWidth": 8,
+                    "namePlacement": "left",
+                    "orientation": "horizontal",
+                    "reduceOptions": {
+                      "calcs": [
+                        "last"
+                      ],
+                      "fields": "",
+                      "values": false
+                    },
+                    "showUnfilled": true,
+                    "sizing": "manual",
+                    "valueMode": "color"
+                  }
+                },
+                "version": "12.3.0"
+              }
+            }
+          },
+          "panel-3": {
+            "kind": "Panel",
+            "spec": {
+              "data": {
+                "kind": "QueryGroup",
+                "spec": {
+                  "queries": [
+                    {
+                      "kind": "PanelQuery",
+                      "spec": {
+                        "hidden": false,
+                        "query": {
+                          "datasource": {
+                            "name": "P4169E866C3094E38"
+                          },
+                          "group": "prometheus",
+                          "kind": "DataQuery",
+                          "spec": {
+                            "editorMode": "code",
+                            "expr": "count by (platform) ($random_gauge)",
+                            "legendFormat": "__auto",
+                            "range": true
+                          },
+                          "version": "v0"
+                        },
+                        "refId": "A"
+                      }
+                    }
+                  ],
+                  "queryOptions": {},
+                  "transformations": []
+                }
+              },
+              "description": "",
+              "id": 3,
+              "links": [],
+              "title": "By platform",
+              "vizConfig": {
+                "group": "bargauge",
+                "kind": "VizConfig",
+                "spec": {
+                  "fieldConfig": {
+                    "defaults": {
+                      "color": {
+                        "mode": "thresholds"
+                      },
+                      "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                          {
+                            "color": "green",
+                            "value": 0
+                          },
+                          {
+                            "color": "red",
+                            "value": 80
+                          }
+                        ]
+                      }
+                    },
+                    "overrides": []
+                  },
+                  "options": {
+                    "displayMode": "gradient",
+                    "legend": {
+                      "calcs": [],
+                      "displayMode": "list",
+                      "placement": "bottom",
+                      "showLegend": false
+                    },
+                    "maxVizHeight": 300,
+                    "minVizHeight": 16,
+                    "minVizWidth": 8,
+                    "namePlacement": "auto",
+                    "orientation": "horizontal",
+                    "reduceOptions": {
+                      "calcs": [
+                        "last"
+                      ],
+                      "fields": "",
+                      "limit": 50,
+                      "values": false
+                    },
+                    "showUnfilled": true,
+                    "sizing": "auto",
+                    "valueMode": "color"
+                  }
+                },
+                "version": "12.3.0"
+              }
+            }
+          }
+        },
+        "layout": {
+          "kind": "GridLayout",
+          "spec": {
+            "items": []
+          }
+        },
+        "links": [],
+        "liveNow": false,
+        "preload": false,
+        "tags": [],
+        "timeSettings": {
+          "autoRefresh": "",
+          "autoRefreshIntervals": [
+            "5s",
+            "10s",
+            "30s",
+            "1m",
+            "5m",
+            "15m",
+            "30m",
+            "1h",
+            "2h",
+            "1d"
+          ],
+          "fiscalYearStartMonth": 0,
+          "from": "now-6h",
+          "hideTimepicker": false,
+          "timezone": "browser",
+          "to": "now"
+        },
+        "title": "Spam2000",
+        "variables": [
+          {
+            "kind": "CustomVariable",
+            "spec": {
+              "allValue": "random_gauge_1,random_gauge_2,random_gauge_3",
+              "allowCustomValue": false,
+              "current": {
+                "text": [
+                  "random_gauge_1",
+                  "random_gauge_2",
+                  "random_gauge_3"
+                ],
+                "value": [
+                  "random_gauge_1",
+                  "random_gauge_2",
+                  "random_gauge_3"
+                ]
+              },
+              "hide": "dontHide",
+              "includeAll": false,
+              "multi": true,
+              "name": "random_gauge",
+              "options": [
+                {
+                  "selected": true,
+                  "text": "random_gauge_1",
+                  "value": "random_gauge_1"
+                },
+                {
+                  "selected": true,
+                  "text": "random_gauge_2",
+                  "value": "random_gauge_2"
+                },
+                {
+                  "selected": true,
+                  "text": "random_gauge_3",
+                  "value": "random_gauge_3"
+                }
+              ],
+              "query": "random_gauge_1,random_gauge_2,random_gauge_3",
+              "skipUrlSync": false
+            }
+          }
+        ]
+      },
+      "status": {}
+    }
+kind: ConfigMap
+metadata:
+  name: dashboard-spam2000
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "true"

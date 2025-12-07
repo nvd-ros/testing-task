@@ -12,7 +12,12 @@ spec:
     helm:
       values: |
         nameOverride: vmks
-
+        grafana:
+          serverDashboardConfigmaps:
+          - dashboard-spam2000
+  - repoURL: https://github.com/nvd-ros/testing-task.git
+    targetRevision: main
+    path: monitoring/
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
