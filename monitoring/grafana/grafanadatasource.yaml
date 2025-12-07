@@ -1,0 +1,20 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: victoriametrics
+  namespace: monitoring
+spec:
+  datasource:
+    database: prometheus
+    type: prometheus
+    isDefault: true
+    url: http://vmsingle-vm-single.monitoring.svc.cluster.local:8428
+    access: proxy
+    name: victoriametrics
+    jsonData:
+      timeInterval: 5s
+      tlsSkipVerify: true
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  allowCrossNamespaceImport: true

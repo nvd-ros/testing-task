@@ -1,0 +1,10 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAgent
+metadata:
+  name: vm-agent
+  namespace: monitoring
+spec:
+  replicas: 1
+  selectAllByDefault: true
+  remoteWrite:
+  - url: "http://vmsingle-vm-single.monitoring.svc.cluster.local:8428/api/v1/write"

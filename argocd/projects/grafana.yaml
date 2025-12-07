@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: monitoring
+  name: grafana
   namespace: argocd
 spec:
-  description: Project for monitoring (Grafana, VictoriaMetrics)
+  description: Project for Grafana
   destinations:
   - namespace: monitoring
     server: https://kubernetes.default.svc

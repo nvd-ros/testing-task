@@ -24,9 +24,13 @@ SYSTEMWIDE_BIN_DIR="/usr/local/bin"
 ARGOCD_RELEASE="argocd"
 ARGOCD_VERSION="9.1.6"
 ARGOCD_NS="argocd"
+ARGOCD_LOCAL_PORT="6080"
 
 TIMEOUT="180s"
 MONITORING_NS="monitoring"
+GRAFANA_LOCAL_PORT="7000"
+VM_LOCAL_PORT="8229"
+VMAGENT_LOCAL_PORT="8429"
 
 # ---------------------------------------------------------------------------
 # HELPERS FUNCTIONS
@@ -216,7 +220,7 @@ else
         --set server.extraArgs[0]="--insecure"
 fi
 
-echoinfo "Waiting for argocd is ready"
+echoinfo "Waiting for argocd to be ready"
 kubectl wait --for='jsonpath={.status.conditions[?(@.type=="Ready")].status}=True' \
   -n "$ARGOCD_NS" pod \
   -l app.kubernetes.io/instance=argocd,app.kubernetes.io/component!=redis-secret-init \
@@ -228,33 +232,47 @@ kubectl apply -f argocd/ --recursive
 ARGOCD_PASS=$(kubectl get secret -n "$ARGOCD_NS" argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 
 echoinfo "\nFor ArgoCD"
-if ps aux | grep -v grep | grep 'kubectl .*port-forward .*svc/argocd-server .*3000:80' &>/dev/null; then
-    echoinfo "Port-forwarding exists, use locahost:3000"
+if ps aux | grep -v grep | grep "kubectl .*port-forward .*svc/argocd-server .*${ARGOCD_LOCAL_PORT}:80" &>/dev/null; then
+    echoinfo "Port-forwarding exists, use localhost:${ARGOCD_LOCAL_PORT}"
 else
     echoinfo "Starting port-forward..."
-    nohup kubectl port-forward -n "$ARGOCD_NS" svc/argocd-server 8000:80 &> /dev/null &
-    echoinfo "Port forwarding was created, use locahost:3000"
+    nohup kubectl port-forward -n "$ARGOCD_NS" svc/argocd-server ${ARGOCD_LOCAL_PORT}:80 &> /dev/null &
+    echoinfo "Port forwarding was created, use localhost:${ARGOCD_LOCAL_PORT}"
 fi
 echoinfo "Credentials are: admin:$ARGOCD_PASS\n"
 
-echoinfo "Waiting for monitoring is ready"
+echoinfo "Waiting for monitoring to be ready"
 kubectl wait -n argocd application monitoring --for='jsonpath={.status.sync.status}=Synced' --timeout="$TIMEOUT"
 
-GRAFANA_PASS=$(kubectl get secret -n "$MONITORING_NS" monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 -d)
+GRAFANA_PASS=$(kubectl get secret -n "$MONITORING_NS" grafana-admin-credentials -o jsonpath="{.data.GF_SECURITY_ADMIN_PASSWORD}" | base64 -d)
 
 echoinfo "\nFor Grafana"
-if ps aux | grep -v grep | grep 'kubectl .*port-forward .*svc/monitoring-grafana .*4000:80' &>/dev/null; then
-    echoinfo "Port-forwarding exists, use locahost:4000"
+if ps aux | grep -v grep | grep "kubectl .*port-forward .*svc/monitoring-grafana .*${GRAFANA_LOCAL_PORT}:80" &>/dev/null; then
+    echoinfo "Port-forwarding exists, use localhost:${GRAFANA_LOCAL_PORT}"
 else
     echoinfo "Starting port-forward..."
-    nohup kubectl port-forward -n monitoring svc/monitoring-grafana 7000:80 &> /dev/null &
-    echoinfo "Port forwarding was created, use locahost:4000"
+    nohup kubectl port-forward -n monitoring svc/monitoring-grafana ${GRAFANA_LOCAL_PORT}:80 &> /dev/null &
+    echoinfo "Port forwarding was created, use localhost:${GRAFANA_LOCAL_PORT}"
 fi
 echoinfo "Credentials are: admin:$GRAFANA_PASS\n"
 
-echoinfo "Starting port-forward for vmagent..."
-nohup kubectl port-forward -n monitoring svc/vmagent-monitoring-vmks 8429:8429 &> /dev/null &
-echoinfo "Port forwarding was created, use locahost:8429"
+echoinfo "\nFor VictoriaMetrics"
+if ps aux | grep -v grep | grep "kubectl .*port-forward .*svc/vmagent-monitoring-vmks .*${VM_LOCAL_PORT}:8429" &>/dev/null; then
+    echoinfo "Port-forwarding exists, use localhost:${VM_LOCAL_PORT}"
+else
+    echoinfo "Starting port-forward..."
+    nohup kubectl port-forward -n monitoring svc/vmsingle-vm-single ${VM_LOCAL_PORT}:8429 &> /dev/null &
+    echoinfo "Port forwarding was created, use localhost:${VM_LOCAL_PORT}"
+fi
+
+echoinfo "\nFor VMAgent"
+if ps aux | grep -v grep | grep "kubectl .*port-forward .*svc/vmagent-vm-agent .*${VMAGENT_LOCAL_PORT}:8429" &>/dev/null; then
+    echoinfo "Port-forwarding exists, use localhost:${VMAGENT_LOCAL_PORT}"
+else
+    echoinfo "Starting port-forward..."
+    nohup kubectl port-forward -n monitoring svc/vmagent-vm-agent ${VMAGENT_LOCAL_PORT}:8429 &> /dev/null &
+    echoinfo "Port forwarding was created, use localhost:${VMAGENT_LOCAL_PORT}"
+fi
 
 echoinfo "DONE"
 exit 0

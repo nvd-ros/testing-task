@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: victoriametrics
+  namespace: argocd
+spec:
+  project: victoriametrics
+  sources:
+  - repoURL: https://victoriametrics.github.io/helm-charts/
+    chart: vm/victoria-metrics-operator
+    targetRevision: 0.57.1
+  - repoURL: https://github.com/nvd-ros/testing-task.git
+    targetRevision: main
+    path: monitoring/victoriametrics
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
