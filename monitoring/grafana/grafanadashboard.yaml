@@ -49,7 +49,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "561a8348-aa27-43f2-8f16-8904e2cbd3a5"
+            "uid": "victoriametricsdatasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -96,7 +96,7 @@ spec:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "561a8348-aa27-43f2-8f16-8904e2cbd3a5"
+                "uid": "victoriametricsdatasource"
               },
               "editorMode": "code",
               "expr": "count(count by (product) ($gauge))",
@@ -111,7 +111,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "561a8348-aa27-43f2-8f16-8904e2cbd3a5"
+            "uid": "victoriametricsdatasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -178,7 +178,7 @@ spec:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "561a8348-aa27-43f2-8f16-8904e2cbd3a5"
+            "uid": "victoriametricsdatasource"
           },
           "fieldConfig": {
             "defaults": {
@@ -293,6 +293,6 @@ spec:
       "timepicker": {},
       "timezone": "browser",
       "title": "spam2000",
-      "uid": "e43a595f-e82a-4701-8aeb-857d2c0da776",
+      "uid": "victoriametricsdatasource",
       "version": 2
     }

@@ -4,6 +4,7 @@ metadata:
   name: victoriametrics
   namespace: monitoring
 spec:
+  uid: victoriametricsdatasource
   datasource:
     database: prometheus
     type: prometheus
