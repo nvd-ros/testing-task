@@ -238,7 +238,6 @@ fi
 echoinfo "Credentials are: admin:$ARGOCD_PASS\n"
 
 echoinfo "Waiting for monitoring is ready"
-kubectl apply -f monitoring
 kubectl wait -n argocd application monitoring --for='jsonpath={.status.sync.status}=Synced' --timeout="$TIMEOUT"
 
 GRAFANA_PASS=$(kubectl get secret -n "$MONITORING_NS" monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 -d)
