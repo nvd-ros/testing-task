@@ -25,6 +25,9 @@ ARGOCD_RELEASE="argocd"
 ARGOCD_VERSION="9.1.6"
 ARGOCD_NS="argocd"
 
+TIMEOUT="180s"
+MONITORING_NS="monitoring"
+
 # ---------------------------------------------------------------------------
 # HELPERS FUNCTIONS
 # ---------------------------------------------------------------------------
@@ -44,7 +47,7 @@ usage() {
 usage: $CMDNAME [OPTIONS]
 
     OPTIONS:
-        -d, --driver ARG     Driver for Minikube (docker or podman). Default: $MINIKUBE_DRIVER
+        -d, --driver ARG     Driver for Minikube (virtualbox, docker or podman). Default: $MINIKUBE_DRIVER
         -c, --cpu ARG        amount of CPU for minikube (int, num cores). DEFAULT: $MINIKUBE_CPU
         -m, --memory ARG     amount of RAM for minikube (in mb, DEFAULT).  $MINIKUBE_MEMORY
         -s, --system         installs all components as system-wide. DEFAULT: $SYSTEMWIDE
@@ -55,7 +58,7 @@ exit 0
 
 echoinfo() {
     local msg="$1"
-    echo "$msg"
+    echo -e "$msg"
 }
 
 echoerr() {
@@ -122,14 +125,6 @@ done
 
 echoinfo "Starting the script"
 
-echoinfo "$MINIKUBE_CPU"
-echoinfo "$MINIKUBE_MEMORY"
-echoinfo "$MINIKUBE_DRIVER"
-echoinfo "$BIN_DIR"
-echoinfo "$SYSTEMWIDE_BIN_DIR"
-echoinfo "$SYSTEMWIDE"
-echoinfo ""
-
 echoinfo "Checking path for binaries"
 if [[ "$SYSTEMWIDE" = "false" ]]; then
     echoinfo "Creating $BIN_DIR directory for all needed binaries"
@@ -185,11 +180,9 @@ if $MINIKUBE_DRIVER inspect minikube &> /dev/null; then
 else
     echoinfo "Minikube is not running. Starting..."
     minikube start --driver=$MINIKUBE_DRIVER --memory=$MINIKUBE_MEMORY --cpus=$MINIKUBE_CPU
-    echoinfo "Enabling Ingress..."
-    minikube addons enable ingress
 fi
 
-# -------------------- Installing ArgoCD --------------------
+# -------------------- Installing ArgoCD and Applications --------------------
 
 echoinfo "Checking argocd namespace"
 if ! kubectl get ns argocd &>/dev/null; then
@@ -221,18 +214,43 @@ else
     helm upgrade "$ARGOCD_RELEASE" argo/argo-cd \
         -n "$ARGOCD_NS" \
         --set server.extraArgs[0]="--insecure"
-
 fi
+
+echoinfo "Waiting for argocd is ready"
+kubectl wait --for='jsonpath={.status.conditions[?(@.type=="Ready")].status}=True' \
+  -n "$ARGOCD_NS" pod \
+  -l app.kubernetes.io/instance=argocd,app.kubernetes.io/component!=redis-secret-init \
+  --timeout="$TIMEOUT"
 
 echoinfo "Applying argocd resources"
 kubectl apply -f argocd/ --recursive
 
-ARGOCD_PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+ARGOCD_PASS=$(kubectl get secret -n "$ARGOCD_NS" argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 
-echoinfo "For ArgoCD"
-echoinfo "To get access to the ArgoCD UI, use 'admin' user and '' initial password. Change it"
-echoinfo "minikube service argocd-server -n argocd"
+echoinfo "\nFor ArgoCD"
+if ps aux | grep -v grep | grep 'kubectl .*port-forward .*svc/argocd-server .*3000:80' &>/dev/null; then
+    echoinfo "Port-forwarding exists, use locahost:3000"
+else
+    echoinfo "Starting port-forward..."
+    nohup kubectl port-forward -n "$ARGOCD_NS" svc/argocd-server 3000:80 &> /dev/null &
+    echoinfo "Port forwarding was created, use locahost:3000"
+fi
+echoinfo "Credentials are: admin:$ARGOCD_PASS\n"
 
+echoinfo "Waiting for monitoring is ready"
+kubectl wait -n argocd application monitoring --for='jsonpath={.status.sync.status}=Synced' --timeout="$TIMEOUT"
+
+GRAFANA_PASS=$(kubectl get secret -n "$MONITORING_NS" monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 -d)
+
+echoinfo "\nFor Grafana"
+if ps aux | grep -v grep | grep 'kubectl .*port-forward .*svc/monitoring-grafana .*4000:80' &>/dev/null; then
+    echoinfo "Port-forwarding exists, use locahost:4000"
+else
+    echoinfo "Starting port-forward..."
+    nohup kubectl port-forward -n monitoring svc/monitoring-grafana 4000:80 &> /dev/null &
+    echoinfo "Port forwarding was created, use locahost:4000"
+fi
+echoinfo "Credentials are: admin:$GRAFANA_PASS\n"
 
 echoinfo "DONE"
 exit 0
