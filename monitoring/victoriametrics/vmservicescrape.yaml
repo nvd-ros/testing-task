@@ -5,7 +5,8 @@ metadata:
   namespace: monitoring
 spec:
   namespaceSelector:
-    kubernetes.io/metadata.name: spam2000
+    any: false
+    matchNames: [ "spam2000" ]
   endpoints:
   - port: http
   selector:
