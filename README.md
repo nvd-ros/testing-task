@@ -9,7 +9,6 @@ Test Project with minikube, Argocd, Grafana and VictoriaMetrics
 - [Installation](#installation)
 - [Screenshots](#screenshots)
 
-
 ---
 ## About
 
@@ -25,7 +24,7 @@ This repository provides an automated setup for a Kubernetes monitoring stack us
   - **Kube State Metrics**
   - **Custom spam2000 application**
 
-The repository also includes a **cluster creation script** (`bootstrap.sh`) that automates the setup of a local Kubernetes cluster using **Minikube**. By default, the script uses **Docker**, but you can configure it to use **Podman** or **VirtualBox** instead. Use to see more:
+The repository also includes a **cluster creation script** (`bootstrap.sh`) that automates the setup of a local Kubernetes cluster using **Minikube**. By default, the script uses **Docker**, but you can configure it to use **Podman** instead. Use to see more:
 
 ```bash
 ./bootstrap.sh --help
@@ -39,7 +38,7 @@ This project uses the following technologies and tools:
 - **Minikube** – Local Kubernetes cluster for testing and development
 - **ArgoCD** – Continuous delivery tool for managing Kubernetes applications
 - **Helm** – Kubernetes package manager for deploying applications
-- **Docker / Podman (container runtimes) or VirtualBox (VM driver)** – Used by Minikube
+- **Docker / Podman (container runtimes)** – Used by Minikube
 - **Grafana Operator** – Manages Grafana custom resources (CRDs)
 - **VictoriaMetrics Operator** – Manages VictoriaMetrics custom resources (CRDs)
 - **Node Exporter** – Exposes node-level metrics
@@ -53,9 +52,11 @@ Before running the script, make sure your system meets the following requirement
 
 - **Operating System:** Linux (tested on Ubuntu 22.04 and WSL2)
 - **Docker:** Must be installed and running (used by default for Minikube)
-- **Podman** or **VirtualBox** (optional) – if you want to use these instead of Docker
+- **Podman** (optional) – if you want to use these instead of Docker
 - **kubectl** – command-line tool for interacting with Kubernetes
 - **Minikube** – installed
+
+If you run the script as `root` user, the script installs docker or podman, depends on `--driver` option.
 
 Minikube / Helm / kubectl – If not present, `bootstrap.sh` will install them into the `bin/` directory in the repository root by default, so **no sudo privileges are required**.
 Use to see more:
