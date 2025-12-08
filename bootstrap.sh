@@ -50,6 +50,10 @@ usage() {
     cat << USAGE >&2
 usage: $CMDNAME [OPTIONS]
 
+    This script installs Minikube and starts a Kubernetes cluster. After that, it downloads Helm and kubectl.
+    By default, all binaries are downloaded to the $BIN_DIR directory.
+    If the SYSTEMWIDE option is set, the binaries are downloaded to the $SYSTEMWIDE_BIN_DIR path instead.
+
     OPTIONS:
         -d, --driver ARG     Driver for Minikube (virtualbox, docker or podman). Default: $MINIKUBE_DRIVER
         -c, --cpu ARG        amount of CPU for minikube (int, num cores). DEFAULT: $MINIKUBE_CPU
