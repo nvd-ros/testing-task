@@ -6,6 +6,9 @@ Test Project with minikube, Argocd, Grafana and VictoriaMetrics
 - [About](#about)
 - [Tech Stack](#tech-stack)
 - [Requirements](#requirements)
+- [Installation](#installation)
+- [Screenshots](#screenshots)
+
 
 ---
 ## About
@@ -48,7 +51,7 @@ This project uses the following technologies and tools:
 
 Before running the script, make sure your system meets the following requirements:
 
-- **Operating System:** Linux (tested on Ubuntu and WSL2)
+- **Operating System:** Linux (tested on Ubuntu 22.04 and WSL2)
 - **Docker:** Must be installed and running (used by default for Minikube)
 - **Podman** or **VirtualBox** (optional) – if you want to use these instead of Docker
 - **kubectl** – command-line tool for interacting with Kubernetes
@@ -61,4 +64,69 @@ Use to see more:
 ./bootstrap.sh --help
 ```
 
+----
+## Installation
 
+Follow the steps below to run the project.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/nvd-ros/testing-task.git
+cd testing-task
+```
+
+### 2. Script arguments and settings (optional)
+
+Run the script with the `--help` option to see all available parameters:
+```bash
+./bootstrap.sh --help
+```
+
+If you want to change the local ports used to access the web UIs, edit the following variables inside the script:
+```bash
+GRAFANA_LOCAL_PORT="3000"
+VM_LOCAL_PORT="8229"
+VMAGENT_LOCAL_PORT="8429"
+SPAM2000_LOCAL_PORT="3030"
+```
+
+### 3. Run the bootstrap script
+
+```bash
+./bootstrap.sh
+```
+
+### 4. Update PATH variable (optional)
+
+If the script installed any binaries into the `bin/` directory, you may want to add this directory to your `PATH` so you can run the tools without using absolute paths:
+```bash
+export PATH="$PATH:$PWD/bin"
+minikube status
+kubectl version --client
+helm version
+```
+
+### 5. Open grafana
+
+The script creates port-forwarding using kubectl and prints the URLs and credentials to stdout.
+Use them to open the UIs for ArgoCD, Grafana, VictoriaMetrics, VMAgent, and the spam2000 application.
+
+### 6. Cleanup (optional)
+
+To delete the Minikube cluster and remove all deployed resources:
+
+```bash
+minikube delete
+```
+
+## Screenshots
+
+### Grafana Dashboard
+![Grafana](./assets/grafana_dashboard.png)
+
+### VictoriaMetrics / VMAgent
+![VictoriaMetrics](./assets/vm_ui.png)
+
+### spam2000 Metrics
+![spam2000](./assets/spam2000_metrics.png)

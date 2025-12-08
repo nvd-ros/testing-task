@@ -28,9 +28,12 @@ ARGOCD_LOCAL_PORT="6080"
 
 TIMEOUT="300s"
 MONITORING_NS="monitoring"
+SPAM2000_NS="spam2000"
+
 GRAFANA_LOCAL_PORT="3000"
 VM_LOCAL_PORT="8229"
 VMAGENT_LOCAL_PORT="8429"
+SPAM2000_LOCAL_PORT="3030"
 
 # ---------------------------------------------------------------------------
 # HELPERS FUNCTIONS
@@ -105,7 +108,6 @@ wait_for_service() {
     fi
 }
 
-
 create_port_forward() {
     local svc_name="$1"
     local localport="$2"
@@ -118,7 +120,7 @@ create_port_forward() {
     else
         echoinfo "Starting port-forward..."
         nohup kubectl port-forward -n ${ns} svc/$svc_name ${localport}:$svcport &> /dev/null &
-        echoinfo "Port forwarding was created, use localhost:${localport}"
+        echoinfo "Port forwarding was created, use http://localhost:${localport}"
     fi
 
 }
@@ -297,6 +299,9 @@ create_port_forward "vmsingle-vm-single" "${VM_LOCAL_PORT}" "8429" "$MONITORING_
 
 echoinfo "\nFor VMAgent"
 create_port_forward "vmagent-vm-agent" "${VMAGENT_LOCAL_PORT}" "8429" "$MONITORING_NS"
+
+echoinfo "\nFor Spam2000 app"
+create_port_forward "spam2000" "${SPAM2000_LOCAL_PORT}" "3000" "$SPAM2000_NS"
 
 echoinfo "DONE"
 exit 0
