@@ -116,7 +116,7 @@ create_port_forward() {
 
     wait_for_service "$svc_name" "$ns"
     if ps aux | grep -v grep | grep "kubectl .*port-forward .*svc/$svc_name .*${localport}:$svcport" &>/dev/null; then
-        echoinfo "Port-forwarding exists, use localhost:${VMAGENT_LOCAL_PORT}"
+        echoinfo "Port-forwarding exists, use http://localhost:${VMAGENT_LOCAL_PORT}"
     else
         echoinfo "Starting port-forward..."
         nohup kubectl port-forward -n ${ns} svc/$svc_name ${localport}:$svcport &> /dev/null &
@@ -185,6 +185,7 @@ else
     BIN_DIR="$SYSTEMWIDE_BIN_DIR"
 fi
 
+echoinfo "Checking minikube"
 if ! command -v minikube &> /dev/null; then
     echoinfo "Minikube not found. Downloading..."
     curl -L https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64 -o "$BIN_DIR/minikube"
@@ -223,9 +224,10 @@ else
     echoinfo "Helm is already installed."
 fi
 
+host_status=$(minikube status --format='{{.Host}}' 2>/dev/null || echo "Stopped")
 echoinfo "Checking if minikube cluster exists"
-if $MINIKUBE_DRIVER inspect minikube &> /dev/null; then
-    echoinfo "Minikube cluster is already running."
+if [[ "$host_status" == "Running" ]]; then
+    echoinfo "Minikube cluster exists."
 else
     echoinfo "Minikube is not running. Starting..."
     minikube start --driver=$MINIKUBE_DRIVER --memory=$MINIKUBE_MEMORY --cpus=$MINIKUBE_CPU

@@ -118,6 +118,7 @@ To delete the Minikube cluster and remove all deployed resources:
 
 ```bash
 minikube delete
+rm -rf ~/.minikube
 ```
 
 ## Screenshots
