@@ -122,11 +122,12 @@ minikube delete
 
 ## Screenshots
 
+### ArgoCD Dashboard
+![Spam2000](./assets/argocd.png)
+
 ### Grafana Dashboard
-![Grafana](./assets/grafana_dashboard.png)
+![Spam2000](./assets/spam2000.png)
+![Spam2000](./assets/cluster.png)
 
 ### VictoriaMetrics / VMAgent
-![VictoriaMetrics](./assets/vm_ui.png)
-
-### spam2000 Metrics
-![spam2000](./assets/spam2000_metrics.png)
+![VictoriaMetrics](./assets/victoriametrics.png)
