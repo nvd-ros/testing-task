@@ -56,8 +56,6 @@ Before running the script, make sure your system meets the following requirement
 - **kubectl** – command-line tool for interacting with Kubernetes
 - **Minikube** – installed
 
-If you run the script as `root` user, the script installs docker or podman, depends on `--driver` option.
-
 Minikube / Helm / kubectl – If not present, `bootstrap.sh` will install them into the `bin/` directory in the repository root by default, so **no sudo privileges are required**.
 Use to see more:
 

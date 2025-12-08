@@ -175,60 +175,6 @@ done
 
 echoinfo "Starting the script"
 
-if [ "$EUID" -eq 0 ]; then
-    echoinfo "Running as root. Checking if driver is docker, if yes check if docker exists"
-    if [ "$MINIKUBE_DRIVER" = "docker" ]; then
-        if ! command -v docker &> /dev/null; then
-            echoinfo "Docker is not installed. Installing..."
-            apt update
-            apt install ca-certificates curl
-            install -m 0755 -d /etc/apt/keyrings
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-            chmod a+r /etc/apt/keyrings/docker.asc
-
-            tee /etc/apt/sources.list.d/docker.sources <<EOF
-            Types: deb
-            URIs: https://download.docker.com/linux/ubuntu
-            Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-            Components: stable
-            Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-            
-            apt update
-            apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin
-            systemctl start docker
-        else
-
-            echoinfo "Docker is installed"
-            if systemctl is-active --quiet docker; then
-                echoinfo "Docker service is running."
-            else
-                echoinfo "Docker service is installed but not running. Running..."
-                systemctl start docker
-            fi
-        fi
-    elif [ "$MINIKUBE_DRIVER" = "podman" ]; then
-        if ! command -v podman &> /dev/null; then
-            echoinfo "Podman is not installed. Installing..."
-            apt-get update
-            apt-get -y install podman
-        else
-            echoinfo "Podman is installed"
-            if systemctl is-active --quiet podman; then
-                echoinfo "Podman service is running."
-            else
-                echoinfo "Podman service is installed but not running. Running..."
-                systemctl start podman
-            fi
-        fi
-    else
-        echoerr "Unkown $MINIKUBE_DRIVER driver. Exiting..."
-    fi
-else
-    echoinfo "Running as regular user, consider docker/podman is pre-installed, running and $USER has permission to use it"
-fi
-
-
 echoinfo "Checking path for binaries"
 if [[ "$SYSTEMWIDE" = "false" ]]; then
     echoinfo "Creating $BIN_DIR directory for all needed binaries"
